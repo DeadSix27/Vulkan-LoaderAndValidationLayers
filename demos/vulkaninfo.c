@@ -743,9 +743,9 @@ void PrintJsonHeader(FILE *out, int vulkan_major, int vulkan_minor, int vulkan_p
     fprintf(out, "{\n");
     fprintf(out, "\t\"$schema\": \"https://schema.khronos.org/vulkan/devsim_1_0_0.json#\",\n");
     fprintf(out, "\t\"comments\": {\n");
-    fprintf(out, "\t\t\"filename\": \"vulkaninfo.json\",\n");
-    fprintf(out, "\t\t\"desc\": \"JSON configuration file describing GPU %d\",\n", selected_gpu);
-    fprintf(out, "\t\t\"vulkanApiVersion\": \"%d.%d.%d\"\n", vulkan_major, vulkan_minor, vulkan_patch); //TODO ask Lenny if I have to use the function pointer to do the thing
+    fprintf(out, "\t\t\"filename\": \"vulkaninfo-gpu%u.json\",\n", selected_gpu);
+    fprintf(out, "\t\t\"desc\": \"JSON configuration file describing GPU %u\",\n", selected_gpu);
+    fprintf(out, "\t\t\"vulkanApiVersion\": \"%d.%d.%d\"\n", vulkan_major, vulkan_minor, vulkan_patch);
     fprintf(out, "\t}");
 }
 
@@ -2162,7 +2162,7 @@ static void AppDumpLimits(const VkPhysicalDeviceLimits *limits, FILE *out, FILE 
     if (json_output) {
         fprintf(jsout, ",\n");
         fprintf(jsout, "\t\t\"limits\": {\n");
-        fprintf(jsout, "\t\t\t\"bufferImageGranularity\": %lu,\n",                                limits->bufferImageGranularity);
+        fprintf(jsout, "\t\t\t\"bufferImageGranularity\": %llu,\n",                               limits->bufferImageGranularity);
         fprintf(jsout, "\t\t\t\"discreteQueuePriorities\": %u,\n",                                limits->discreteQueuePriorities);
         fprintf(jsout, "\t\t\t\"framebufferColorSampleCounts\": %u,\n",                           limits->framebufferColorSampleCounts);
         fprintf(jsout, "\t\t\t\"framebufferDepthSampleCounts\": %u,\n",                           limits->framebufferDepthSampleCounts);
@@ -2255,16 +2255,16 @@ static void AppDumpLimits(const VkPhysicalDeviceLimits *limits, FILE *out, FILE 
         fprintf(jsout, "\t\t\t],\n");
         fprintf(jsout, "\t\t\t\"maxViewports\": %u,\n",                                           limits->maxViewports);
         fprintf(jsout, "\t\t\t\"minInterpolationOffset\": %g,\n",                                 limits->minInterpolationOffset);
-        fprintf(jsout, "\t\t\t\"minMemoryMapAlignment\": %lu,\n",                                  limits->minMemoryMapAlignment);
-        fprintf(jsout, "\t\t\t\"minStorageBufferOffsetAlignment\": %lu,\n",                       limits->minStorageBufferOffsetAlignment);
-        fprintf(jsout, "\t\t\t\"minTexelBufferOffsetAlignment\": %lu,\n",                         limits->minTexelBufferOffsetAlignment);
+        fprintf(jsout, "\t\t\t\"minMemoryMapAlignment\": " PRINTF_SIZE_T_SPECIFIER ",\n",         limits->minMemoryMapAlignment);
+        fprintf(jsout, "\t\t\t\"minStorageBufferOffsetAlignment\": %llu,\n",                      limits->minStorageBufferOffsetAlignment);
+        fprintf(jsout, "\t\t\t\"minTexelBufferOffsetAlignment\": %llu,\n",                        limits->minTexelBufferOffsetAlignment);
         fprintf(jsout, "\t\t\t\"minTexelGatherOffset\": %d,\n",                                   limits->minTexelGatherOffset);
         fprintf(jsout, "\t\t\t\"minTexelOffset\": %d,\n",                                         limits->minTexelOffset);
-        fprintf(jsout, "\t\t\t\"minUniformBufferOffsetAlignment\": %lu,\n",                       limits->minUniformBufferOffsetAlignment);
+        fprintf(jsout, "\t\t\t\"minUniformBufferOffsetAlignment\": %llu,\n",                      limits->minUniformBufferOffsetAlignment);
         fprintf(jsout, "\t\t\t\"mipmapPrecisionBits\": %u,\n",                                    limits->mipmapPrecisionBits);
-        fprintf(jsout, "\t\t\t\"nonCoherentAtomSize\": %lu,\n",                                   limits->nonCoherentAtomSize);
-        fprintf(jsout, "\t\t\t\"optimalBufferCopyOffsetAlignment\": %lu,\n",                      limits->optimalBufferCopyOffsetAlignment);
-        fprintf(jsout, "\t\t\t\"optimalBufferCopyRowPitchAlignment\": %lu,\n",                    limits->optimalBufferCopyRowPitchAlignment);
+        fprintf(jsout, "\t\t\t\"nonCoherentAtomSize\": %llu,\n",                                  limits->nonCoherentAtomSize);
+        fprintf(jsout, "\t\t\t\"optimalBufferCopyOffsetAlignment\": %llu,\n",                     limits->optimalBufferCopyOffsetAlignment);
+        fprintf(jsout, "\t\t\t\"optimalBufferCopyRowPitchAlignment\": %llu,\n",                   limits->optimalBufferCopyRowPitchAlignment);
         fprintf(jsout, "\t\t\t\"pointSizeGranularity\": %g,\n",                                   limits->pointSizeGranularity);
         fprintf(jsout, "\t\t\t\"pointSizeRange\": [\n");
         fprintf(jsout, "\t\t\t\t%g,\n",                                                           limits->pointSizeRange[0]);
@@ -2274,7 +2274,7 @@ static void AppDumpLimits(const VkPhysicalDeviceLimits *limits, FILE *out, FILE 
         fprintf(jsout, "\t\t\t\"sampledImageDepthSampleCounts\": %u,\n",                          limits->sampledImageDepthSampleCounts);
         fprintf(jsout, "\t\t\t\"sampledImageIntegerSampleCounts\": %u,\n",                        limits->sampledImageIntegerSampleCounts);
         fprintf(jsout, "\t\t\t\"sampledImageStencilSampleCounts\": %u,\n",                        limits->sampledImageStencilSampleCounts);
-        fprintf(jsout, "\t\t\t\"sparseAddressSpaceSize\": %lu,\n",                                limits->sparseAddressSpaceSize);
+        fprintf(jsout, "\t\t\t\"sparseAddressSpaceSize\": %lld,\n",                               (long long int)limits->sparseAddressSpaceSize);
         fprintf(jsout, "\t\t\t\"standardSampleLocations\": %u,\n",                                limits->standardSampleLocations);
         fprintf(jsout, "\t\t\t\"storageImageSampleCounts\": %u,\n",                               limits->storageImageSampleCounts);
         fprintf(jsout, "\t\t\t\"strictLines\": %u,\n",                                            limits->strictLines);
@@ -2469,7 +2469,7 @@ static void AppGpuDumpQueueProps(const struct AppGpu *gpu, uint32_t id, FILE *ou
         fprintf(jsout, "\t\t\t},\n");
         fprintf(jsout, "\t\t\t\"queueCount\": %u,\n", props->queueCount);
         fprintf(jsout, "\t\t\t\"queueFlags\": %u,\n", props->queueFlags);
-        fprintf(jsout, "\t\t\t\"timestampValidBits\": %u,\n", props->timestampValidBits);
+        fprintf(jsout, "\t\t\t\"timestampValidBits\": %u\n", props->timestampValidBits);
         fprintf(jsout, "\t\t}");
     }
 
@@ -2549,7 +2549,7 @@ static void AppGpuDumpMemoryProps(const struct AppGpu *gpu, FILE *out, FILE *jso
             fprintf(jsout, "\n");
             fprintf(jsout,"\t\t\t{\n");
             fprintf(jsout,"\t\t\t\t\"flags\": %u,\n", heap_flags);
-            fprintf(jsout,"\t\t\t\t\"size\": %lu\n", memSize);
+            fprintf(jsout,"\t\t\t\t\"size\": " PRINTF_SIZE_T_SPECIFIER "\n", (size_t)memSize);
             fprintf(jsout,"\t\t\t}");
         }
     }
@@ -2577,7 +2577,7 @@ static void AppGpuDumpMemoryProps(const struct AppGpu *gpu, FILE *out, FILE *jso
     for (uint32_t i = 0; i < props->memoryTypeCount; ++i) {
         if (html_output) {
             fprintf(out, "\t\t\t\t\t\t\t<details><summary>memoryTypes[<div class='val'>%u</div>]</summary>\n", i);
-            fprintf(out, "\t\t\t\t\t\t\t\t<details><summary>heapIndex = <div class='val'>%u</div></summary></summary></details>\n", props->memoryTypes[i].heapIndex);
+            fprintf(out, "\t\t\t\t\t\t\t\t<details><summary>heapIndex = <div class='val'>%u</div></summary></details>\n", props->memoryTypes[i].heapIndex);
             fprintf(out, "\t\t\t\t\t\t\t\t<details open><summary>propertyFlags = <div class='val'>0x%" PRIxLEAST32 "</div></summary>", props->memoryTypes[i].propertyFlags);
             if (props->memoryTypes[i].propertyFlags == 0) {
                 fprintf(out, "</details>\n");
